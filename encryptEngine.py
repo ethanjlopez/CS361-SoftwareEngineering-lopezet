@@ -10,9 +10,9 @@ def enterPassword():
 def enterCode():
     return encryptText()
 
-def encryptText():
-    randomtext = randomText()
-    randompass = enterPassword()
+def encryptText(text, password):
+    randomtext = text
+    randompass = password
     hex_str = ''
     bin_str = ''
     lengthText = len(randomtext)
@@ -31,36 +31,26 @@ def encryptText():
 
     textBinary = ' '.join(format(ord(x), 'b') for x in randomtext)
     passBinary = ' '.join(format(ord(x), 'b') for x in randompass)
-    print ('OG TEXT BIN: ' + textBinary)
-    print ('PASS BIN: ' + passBinary)
-    print("XOR BIN: " + bin_str)
-    print( 'HEX STR BIN: ' + hex_str)
     hex_byte = bytes.fromhex(hex_str)
     encoded_data = base64.b64encode(hex_byte)
-    print('ENCODED BIN: ', encoded_data)
     return encoded_data
 
     
-def decryptText(enc_Base64):    
-    password = enterPassword()
-    codedText = enterCode()
+def decryptText(data, password):    
     hex_str = ''
     decoded_data_bin = ''
     final_text = ''
-    decoded_data = base64.b64decode(enc_Base64)
+    decoded_data = base64.b64decode(data)
     # num = bin(int.from_bytes(decoded_data, byteorder='big'))
     # print(num)
     lengthxor = len(decoded_data)
 
     for my_byte in range(0, lengthxor):
-        print(f'{decoded_data[my_byte]:0>8b}', end=' ')
         j = my_byte % len(password)
         new = decoded_data[my_byte] ^ ord(password[j])
         final_text += chr(new) 
-    print(final_text)
+    return final_text
         
-
-
 
 
 
@@ -69,20 +59,6 @@ def decryptText(enc_Base64):
 def main():
     data = encryptText()
     decryptText(data)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
