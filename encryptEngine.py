@@ -1,14 +1,5 @@
 import base64
 
-def randomText():
-    return "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-
-
-def enterPassword():
-    return "SummerBeavers"
-
-def enterCode():
-    return encryptText()
 
 def encryptText(text, password):
     randomtext = text

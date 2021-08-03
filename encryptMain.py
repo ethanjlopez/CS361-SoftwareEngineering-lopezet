@@ -2,7 +2,7 @@ from encryptEngine import *
 from tkinter import * 
 from tkinter import ttk
 import requests
-
+from tkinter import messagebox
 root = Tk()
 root.title("Encryption Program")
 
@@ -56,10 +56,10 @@ clrBttn.grid(column=2, row=1)
 randomTxtBttn = Button(upperSideContent, text='Random Text', command= lambda: randomTextCall())
 randomTxtBttn.grid(column=1, row=0, columnspan=2)
 
-encryptBttn = Button(middleContent, text='Encrypt', command= lambda: encryptTextfield())
+encryptBttn = Button(middleContent, text='Encrypt', command= lambda: encrypt_decrypt_Textfield(encryptText))
 encryptBttn.grid(column=2, row=0)
 
-decryptBttn = Button(middleContent, text='Decrypt', command= lambda: decryptTextField())
+decryptBttn = Button(middleContent, text='Decrypt', command= lambda: encrypt_decrypt_Textfield(decryptText))
 decryptBttn.grid(column=3, row=0)
 
 cpyBttn2 = Button(lowerSideContent, text='Copy', command= lambda: copyField(secondField) )
@@ -87,18 +87,16 @@ def randomTextCall():
     inputValue = rndmText.json()
     textfield.insert("1.0", inputValue['content'])
 
-def encryptTextfield():
+def encrypt_decrypt_Textfield(mode):
+    
     inputValue = textfield.get("1.0", "end-1c")
     passValue = passEntry.get()
-    secondField.delete('1.0', 'end-1c')
-    secondField.insert('1.0', encryptText(inputValue, passValue))
 
+    if len(inputValue) == 0 or len(passValue) == 0:
+        messagebox.showerror("Input Error", "The Password and Input Text Fields cannot be empty.")
 
-def decryptTextField():
-    inputValue = textfield.get("1.0", "end-1c")
-    passValue = passEntry.get()
     secondField.delete('1.0', 'end-1c')
-    secondField.insert('1.0', decryptText(inputValue, passValue))
+    secondField.insert('1.0', mode(inputValue, passValue))
 
 
 def clearField(field):
