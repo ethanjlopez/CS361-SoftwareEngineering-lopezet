@@ -3,12 +3,28 @@ from tkinter import *
 from tkinter import ttk
 import requests
 from tkinter import messagebox
+from tkinter import filedialog
+from PIL import ImageTk, Image
+import urllib
+import base64
 root = Tk()
 root.title("Encryption Program")
 
 
-canvas = Frame(root, width=800, height=800)
+style = ttk.Style(root)
+style.configure('lefttab.TNotebook', tabposition='ne')
+tabs = ttk.Notebook(root, style='lefttab.TNotebook')
+tabs.grid(row=0, column=3)
+
+canvas = Frame(tabs)
+canvas2 = Frame(tabs)
+canvas3 = Frame(tabs)
+
 canvas.grid(columnspan=2, rowspan=3)
+
+tabs.add(canvas, text="Text")
+tabs.add(canvas2, text="Image")
+tabs.add(canvas3, text='Advanced')
 
 #frames
 tabSection = Frame(canvas)
@@ -30,10 +46,10 @@ lowerSideContent = Frame(canvas)
 lowerSideContent.grid(column=1, row=2)
 
 #instructions
-instructions = Label(upperContent, text="Please enter text to encryp/decrypt: ")
+instructions = Label(upperContent, text="1. Please enter text to encryp/decrypt: ")
 instructions.grid(column=0, row=0, sticky= W)
 
-secondInstructions = Label(lowerContent, text="This is your Encrypted / Decrypted Text: ")
+secondInstructions = Label(lowerContent, text="2. This is your Encrypted / Decrypted Text: ")
 secondInstructions.grid(column=0, row=0, sticky= W)
 
 #text
@@ -72,12 +88,26 @@ clrBttn2.grid(column=2, row=1)
 
 #notebook
 
-# tabs = ttk.Notebook(canvas)
-# tabs.add(upperContent, text='One')
+imageContent = Frame(canvas2)
+imageContent.grid(column=0,row=0)
 
+label = Label(imageContent)
+label.grid(column=0, row=0)
 
+panelU = Label(imageContent)
+panelU.grid(column=0, row=0)
 
+upldButton = Button(imageContent, text='upload', command= lambda: open_img())
+upldButton.grid(column=1, row=0)
 
+rndmPicButton = Button(imageContent, text='random', command=lambda: randomPicture())
+rndmPicButton.grid(column=2, row=0)
+
+encryptImgButton = Button(imageContent, text='Encrypt', command= lambda: encryptImage(filename))
+encryptImgButton.grid(column=3, row=0)
+
+decryptImgButton = Button(imageContent, text='Decrypt', command= lambda: decryptImage(filename))
+decryptImgButton.grid(column=4, row=0)
 
 #commands
 
@@ -107,6 +137,32 @@ def copyField(field):
     root.clipboard_clear()
     root.clipboard_append(data)
 
+def UploadAction():
+    global filename
+    filename = filedialog.askopenfilename()
+    return filename
+
+def randomPicture():
+    rndmImage = requests.get('https://imagescraperapi.herokuapp.com/?url=https://en.wikipedia.org/wiki/Bluebird')
+    inputValue = rndmImage.json()
+    img = inputValue['image-url']
+    bin_img = urllib.request.urlopen('https://en.wikipedia.org/wiki/Bluebird')
+    raw_data = bin_img.read()
+    bin_img.close()
+    b64_data = base64.encodestring(raw_data)
+    image = PhotoImage(data=b64_data)
+    panel = Label(imageContent, image=image)
+    panel.image = image
+    panel.grid(column=0, row=0)
+
+
+def open_img():
+    x = UploadAction()
+    img = Image.open(x)
+    img = img.resize((250, 250), Image.ANTIALIAS)
+    img = ImageTk.PhotoImage(img)
+    panelU.configure(image=img)
+    panelU.image = img
 
 root.mainloop()
 
