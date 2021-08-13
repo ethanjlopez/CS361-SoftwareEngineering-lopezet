@@ -88,25 +88,28 @@ clrBttn2.grid(column=2, row=1)
 
 #notebook
 
-imageContent = Frame(canvas2)
+imageContent = Frame(canvas2, width=300, height=300)
 imageContent.grid(column=0,row=0)
+
+imageSide = Frame(canvas2)
+imageSide.grid(column=1, row=0, sticky=E)
 
 label = Label(imageContent)
 label.grid(column=0, row=0)
 
-panelU = Label(imageContent)
-panelU.grid(column=0, row=0)
+panel = Label(imageContent)
+panel.grid(column=0, row=0)
 
-upldButton = Button(imageContent, text='upload', command= lambda: open_img())
+upldButton = Button(imageSide, text='Browse', command= lambda: open_img())
 upldButton.grid(column=1, row=0)
 
-rndmPicButton = Button(imageContent, text='random', command=lambda: randomPicture())
+rndmPicButton = Button(imageSide, text='Random', command=lambda: randomPicture())
 rndmPicButton.grid(column=2, row=0)
 
-encryptImgButton = Button(imageContent, text='Encrypt', command= lambda: encryptImage(filename))
+encryptImgButton = Button(imageSide, text='Encrypt', command= lambda: encryptImage(filename))
 encryptImgButton.grid(column=3, row=0)
 
-decryptImgButton = Button(imageContent, text='Decrypt', command= lambda: decryptImage(filename))
+decryptImgButton = Button(imageSide, text='Decrypt', command= lambda: decryptImage(filename))
 decryptImgButton.grid(column=4, row=0)
 
 #commands
@@ -159,10 +162,10 @@ def randomPicture():
 def open_img():
     x = UploadAction()
     img = Image.open(x)
-    img = img.resize((250, 250), Image.ANTIALIAS)
+    img = img.resize((300, 300), Image.ANTIALIAS)
     img = ImageTk.PhotoImage(img)
-    panelU.configure(image=img)
-    panelU.image = img
+    panel.configure(image=img)
+    panel.image = img
 
 root.mainloop()
 
