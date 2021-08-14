@@ -97,8 +97,8 @@ imageSide.grid(column=2, row=1)
 newFrame = Frame(canvas2)
 newFrame.grid(column=0, row=1)
 
-panel = Label(newFrame, text="Please Upload an Image")
-panel.grid()
+imagePanel = Label(newFrame, text="Please Upload an Image")
+imagePanel.grid()
 
 imageEtryLbl = Label(canvas2, text="Password:")
 imageEtryLbl.grid(column=1, row=2)
@@ -154,6 +154,7 @@ def UploadAction():
     return filename
 
 def randomPicture():
+    """Makes a GET Request to an image scraper and populates the image field with a random image."""
     rndmImage = requests.get('https://imagescraperapi.herokuapp.com/?url=https://en.wikipedia.org/wiki/Beaver')
     inputValue = rndmImage.json()
     img = inputValue['image-url']
@@ -162,55 +163,47 @@ def randomPicture():
         with open('temp.jpg', 'wb') as f:
             f.write(url.read())
     
-    img = Image.open('temp.jpg')
+    randomImg = Image.open('temp.jpg')
     global randomB
-    randomB = img
-    img = img.resize((300,300), Image.ANTIALIAS)
-    img = ImageTk.PhotoImage(img)
-    panel.configure(image=img)
-    panel.image = img
-
-    
-    
-    # raw_data = bin_img.read()
-    # bin_img.close()
-    # b64_data = base64.encode(raw_data)
-    # image = PhotoImage(data=b64_data)
-    # panel = Label(imageContent, image=image)
-    # panel.image = image
-    # panel.grid(column=0, row=0)
+    randomB = randomImg
+    randomImg = img.resize((300,300), Image.ANTIALIAS)
+    randomImg = ImageTk.PhotoImage(randomImg)
+    imagePanel.configure(image=randomImg)
+    imagePanel.image = randomImg
+    return  
 
 def encrypt_decrypt_image(service):
     if service == encryptImage:
         if encryptImage(filename, imageEntry.get()) == True:
-            panel.configure(image='')
-            panel.configure(text="Encryption of Image was Successful!")
+            imagePanel.configure(image='')
+            imagePanel.configure(text="Encryption of Image was Successful!")
     elif service == decryptImage:
         if decryptImage(filename, imageEntry.get()) == True:
             img = Image.open(filename)
             img = img.resize((300, 300), Image.ANTIALIAS)
             img = ImageTk.PhotoImage(img)
-            panel.configure(image=img)
-            panel.image = img
+            imagePanel.configure(image=img)
+            imagePanel.image = img
             
 def open_img():
+    """Upload's an image from the user's local files then populates that image into the GUI."""
     x = UploadAction()
     try:
-        img = Image.open(x)
-        img = img.resize((300, 300), Image.ANTIALIAS)
-        img = ImageTk.PhotoImage(img)
-        panel.configure(image=img)
-        panel.image = img
+        uploadedImage = Image.open(x)
+        uploadedImage = uploadedImage.resize((300, 300), Image.ANTIALIAS)
+        uploadedImage = ImageTk.PhotoImage(uploadedImage)
+        imagePanel.configure(image=uploadedImage)
+        imagePanel.image = uploadedImage
     except UnidentifiedImageError:
-        panel.configure(image='')
-        panel.configure(text='Upload of Encrypted File was Successful!')
+        imagePanel.configure(image='')
+        imagePanel.configure(text='Upload of Encrypted File was Successful!')
 
 def save_img():
     image = Image.open("temp.jpg")
     photo = ImageTk.PhotoImage(image)
     filedialog.asksaveasfilename(initialdir="/", title="Select file", filetypes=(
         ('JPEG', ('*.jpg', '*.jpeg', '*.jpe')), ('PNG', '*.png'), ('BMP', ('*.bmp', '*.jdib')), ('GIF', '*.gif')))
-    photo.write('photo.jpg', format='jpg')
+    photo.save()
 
 root.mainloop()
 
