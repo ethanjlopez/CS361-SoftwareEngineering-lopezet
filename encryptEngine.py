@@ -44,21 +44,11 @@ def decryptText(data, password):
     return final_text
         
 
-def encryptImage(path):
-     # take path of image as a input
-  
-     
-    # taking encryption key as input
-
-    # print path of image file and encryption key that
-    # we are using
-    print('The path of file : ', path)
-    print('Key for encryption : ', 22)
-     
-    # open file for reading purpose
+def encryptImage(path, key):
+    
     fin = open(path, 'rb')
      
-    # storing image data in variable "image"
+
     image = fin.read()
     fin.close()
      
@@ -68,7 +58,8 @@ def encryptImage(path):
     
     # performing XOR operation on each value of bytearray
     for index, values in enumerate(image):
-        image[index] = values ^ 22
+        j = index % len(key)
+        image[index] = values ^ ord(key[j])
  
     # opening file for writing purpose
     fin = open(path, 'wb')
@@ -77,23 +68,12 @@ def encryptImage(path):
     fin.write(image)
 
     fin.close()
-    print('Encryption Done...')
+    return True
  
-def decryptImage(path):
-     # take path of image as a input
-     
-    # taking decryption key as input
-    key = int(input('Enter Key for encryption of Image : '))
-     
-    # print path of image file and decryption key that we are using
-    print('The path of file : ', path)
-    print('Note : Encryption key and Decryption key must be same.')
-    print('Key for Decryption : ', key)
-     
-    # open file for reading purpose
+def decryptImage(path, key):
+
     fin = open(path, 'rb')
-     
-    # storing image data in variable "image"
+
     image = fin.read()
     fin.close()
      
@@ -102,7 +82,8 @@ def decryptImage(path):
  
     # performing XOR operation on each value of bytearray
     for index, values in enumerate(image):
-        image[index] = values ^ key
+        j = index % len(key)
+        image[index] = values ^ ord(key[j])
  
     # opening file for writing purpose
     fin = open(path, 'wb')
@@ -110,10 +91,10 @@ def decryptImage(path):
     # writing decryption data in image
     fin.write(image)
     fin.close()
-    print('Decryption Done...')
+    return True
 
 def main():
-    encryptImage(22)
+    decryptImage('G:\Files\Pictures\\13_02_sadies\\3535_10200126919230253_1664104074_n_10200126919230253.jpg', 22)
 
 
 

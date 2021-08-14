@@ -4,9 +4,9 @@ from tkinter import ttk
 import requests
 from tkinter import messagebox
 from tkinter import filedialog
-from PIL import ImageTk, Image
+from PIL import ImageTk, Image, UnidentifiedImageError
 import urllib
-import base64
+
 root = Tk()
 root.title("Encryption Program")
 
@@ -14,21 +14,19 @@ root.title("Encryption Program")
 style = ttk.Style(root)
 style.configure('lefttab.TNotebook', tabposition='ne')
 tabs = ttk.Notebook(root, style='lefttab.TNotebook')
-tabs.grid(row=0, column=3)
+tabs.grid()
 
 canvas = Frame(tabs)
 canvas2 = Frame(tabs)
-canvas3 = Frame(tabs)
 
-canvas.grid(columnspan=2, rowspan=3)
+
+canvas.grid(columnspan = 2, rowspan = 3)
 
 tabs.add(canvas, text="Text")
 tabs.add(canvas2, text="Image")
-tabs.add(canvas3, text='Advanced')
+
 
 #frames
-tabSection = Frame(canvas)
-tabSection.grid(column=1, row=0, sticky=NW)
 
 upperContent = Frame(canvas)
 upperContent.grid(column=0, row=0)
@@ -87,30 +85,40 @@ clrBttn2.grid(column=2, row=1)
 
 
 #notebook
+titleLabel = Label(canvas2, text= "Choose an Image that you wish to encrypt: ")
+titleLabel.grid(column=0, row=0)
 
-imageContent = Frame(canvas2, width=300, height=300)
-imageContent.grid(column=0,row=0)
+imageContent = Frame(canvas2, width=350, height=350)
+imageContent.grid(column=0,row=1)
 
 imageSide = Frame(canvas2)
-imageSide.grid(column=1, row=0, sticky=E)
+imageSide.grid(column=2, row=1)
 
-label = Label(imageContent)
-label.grid(column=0, row=0)
+newFrame = Frame(canvas2)
+newFrame.grid(column=0, row=1)
 
-panel = Label(imageContent)
-panel.grid(column=0, row=0)
+panel = Label(newFrame, text="Please Upload an Image")
+panel.grid()
 
-upldButton = Button(imageSide, text='Browse', command= lambda: open_img())
-upldButton.grid(column=1, row=0)
+imageEtryLbl = Label(canvas2, text="Password:")
+imageEtryLbl.grid(column=1, row=2)
+imageEntry = ttk.Entry(canvas2)
+imageEntry.grid(column=2, row=2)
 
-rndmPicButton = Button(imageSide, text='Random', command=lambda: randomPicture())
-rndmPicButton.grid(column=2, row=0)
+upldButton = Button(imageSide, text='Browse', command= lambda: open_img(), width=10)
+upldButton.grid(column=0, row=0)
 
-encryptImgButton = Button(imageSide, text='Encrypt', command= lambda: encryptImage(filename))
-encryptImgButton.grid(column=3, row=0)
+rndmPicButton = Button(imageSide, text='Random', width=10, command=lambda: randomPicture())
+rndmPicButton.grid(column=1, row=0)
 
-decryptImgButton = Button(imageSide, text='Decrypt', command= lambda: decryptImage(filename))
-decryptImgButton.grid(column=4, row=0)
+encryptImgButton = Button(imageSide, text='Encrypt', width=10, command= lambda: encrypt_decrypt_image(encryptImage))
+encryptImgButton.grid(column=0, row=2)
+
+decryptImgButton = Button(imageSide, text='Decrypt', width=10, command= lambda: encrypt_decrypt_image(decryptImage))
+decryptImgButton.grid(column=1, row=2)
+
+saveImageButton = Button(imageSide, text='Save As...', width=20, command= lambda: save_img(save_img()))
+saveImageButton.grid(column=0, row=1, columnspan=2)
 
 #commands
 
@@ -146,26 +154,63 @@ def UploadAction():
     return filename
 
 def randomPicture():
-    rndmImage = requests.get('https://imagescraperapi.herokuapp.com/?url=https://en.wikipedia.org/wiki/Bluebird')
+    rndmImage = requests.get('https://imagescraperapi.herokuapp.com/?url=https://en.wikipedia.org/wiki/Beaver')
     inputValue = rndmImage.json()
     img = inputValue['image-url']
-    bin_img = urllib.request.urlopen('https://en.wikipedia.org/wiki/Bluebird')
-    raw_data = bin_img.read()
-    bin_img.close()
-    b64_data = base64.encodestring(raw_data)
-    image = PhotoImage(data=b64_data)
-    panel = Label(imageContent, image=image)
-    panel.image = image
-    panel.grid(column=0, row=0)
-
-
-def open_img():
-    x = UploadAction()
-    img = Image.open(x)
-    img = img.resize((300, 300), Image.ANTIALIAS)
+   
+    with urllib.request.urlopen('https://' + img[2:]) as url:
+        with open('temp.jpg', 'wb') as f:
+            f.write(url.read())
+    
+    img = Image.open('temp.jpg')
+    global randomB
+    randomB = img
+    img = img.resize((300,300), Image.ANTIALIAS)
     img = ImageTk.PhotoImage(img)
     panel.configure(image=img)
     panel.image = img
+
+    
+    
+    # raw_data = bin_img.read()
+    # bin_img.close()
+    # b64_data = base64.encode(raw_data)
+    # image = PhotoImage(data=b64_data)
+    # panel = Label(imageContent, image=image)
+    # panel.image = image
+    # panel.grid(column=0, row=0)
+
+def encrypt_decrypt_image(service):
+    if service == encryptImage:
+        if encryptImage(filename, imageEntry.get()) == True:
+            panel.configure(image='')
+            panel.configure(text="Encryption of Image was Successful!")
+    elif service == decryptImage:
+        if decryptImage(filename, imageEntry.get()) == True:
+            img = Image.open(filename)
+            img = img.resize((300, 300), Image.ANTIALIAS)
+            img = ImageTk.PhotoImage(img)
+            panel.configure(image=img)
+            panel.image = img
+            
+def open_img():
+    x = UploadAction()
+    try:
+        img = Image.open(x)
+        img = img.resize((300, 300), Image.ANTIALIAS)
+        img = ImageTk.PhotoImage(img)
+        panel.configure(image=img)
+        panel.image = img
+    except UnidentifiedImageError:
+        panel.configure(image='')
+        panel.configure(text='Upload of Encrypted File was Successful!')
+
+def save_img():
+    image = Image.open("temp.jpg")
+    photo = ImageTk.PhotoImage(image)
+    filedialog.asksaveasfilename(initialdir="/", title="Select file", filetypes=(
+        ('JPEG', ('*.jpg', '*.jpeg', '*.jpe')), ('PNG', '*.png'), ('BMP', ('*.bmp', '*.jdib')), ('GIF', '*.gif')))
+    photo.write('photo.jpg', format='jpg')
 
 root.mainloop()
 
